@@ -1,0 +1,4 @@
+import sys
+from streamlit.web import cli as stcli
+sys.argv = ["streamlit", "run",r"C:\Users\Sayali\Dropbox\My PC (LAPTOP-51JGVSS3)\Desktop\InfoSec\hospital_a\app.py"] 
+sys.exit(stcli.main())

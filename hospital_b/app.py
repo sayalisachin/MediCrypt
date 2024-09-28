@@ -1,6 +1,7 @@
 import streamlit as st
 from decryption import decrypt_dna
 from steganography import extract_message
+import matplotlib.pyplot as plt
 
 def main():
     st.title("Hospital B Interface")
@@ -23,6 +24,11 @@ def main():
                 st.success("Data extracted and decrypted successfully!")
             except ValueError as e:
                 st.error(f"Decryption error: {e}")
+    # Example plot
+    st.header("Data Visualization")
+    fig, ax = plt.subplots()
+    ax.plot([1, 2, 3], [4, 5, 6])
+    st.pyplot(fig)
 
 if __name__ == "__main__":
     main()
