@@ -32,8 +32,9 @@ def main():
             - Secure communication between hospitals using DNA encryption and image steganography.
             - View history of encrypted and decrypted data.
             """)
-
-        if page == "Hospital A":
+        if page == "Analytics":
+            import pages.app
+        elif page == "Hospital A":
             import pages.hospital_a
         elif page == "Hospital B":
             import pages.hospital_b
