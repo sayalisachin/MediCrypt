@@ -33,7 +33,7 @@ def main():
             - View history of encrypted and decrypted data.
             """)
         if page == "Analytics":
-            import pages.app
+            import pages.statistics
         elif page == "Hospital A":
             import pages.hospital_a
         elif page == "Hospital B":
