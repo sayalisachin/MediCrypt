@@ -4,6 +4,7 @@ from steganography import embed_message
 from PIL import Image
 import io
 import matplotlib.pyplot as plt
+import numpy as np
 
 # Function to display the Streamlit app UI
 def main():
@@ -78,11 +79,8 @@ def main():
         else:
             st.error("⚠️ Please provide both patient details and an image to proceed.")
         
-        # Example plot
-        st.header("Data Visualization")
-        fig, ax = plt.subplots()
-        ax.plot([1, 2, 3], [4, 5, 6])
-        st.pyplot(fig)
+        
+            
 
 
 
