@@ -1,15 +1,48 @@
 import streamlit as st
+import pydicom
+import numpy as np
+import io
+import pandas as pd
+import pyvista as pv
+from PIL import Image
 from encryption import encrypt_dna
 from steganography import embed_message
-from PIL import Image
-import io
-import matplotlib.pyplot as plt
-import numpy as np
+
+# Function to save a DICOM report as a CSV file
+# Function to save a DICOM report as a CSV file
+def save_dicom_report(dicom_data):
+    # Ensure that all values are single values (or flatten arrays)
+    report_data = {
+        "Patient Name": [dicom_data.PatientName.family_name if hasattr(dicom_data, 'PatientName') else "N/A"],
+        "Patient ID": [dicom_data.PatientID if hasattr(dicom_data, 'PatientID') else "N/A"],
+        "Age": [dicom_data.PatientAge if hasattr(dicom_data, 'PatientAge') else "N/A"],
+        "Study Date": [dicom_data.StudyDate if hasattr(dicom_data, 'StudyDate') else "N/A"],
+        "Modality": [dicom_data.Modality if hasattr(dicom_data, 'Modality') else "N/A"],
+    }
+    
+    # Ensure the lengths match and create a DataFrame with appropriate row length
+    df = pd.DataFrame(report_data)
+    
+    return df
+
+
+# Function to visualize 3D DICOM images
+def visualize_3d_volume(dicom_array):
+    # Convert pixel array to float
+    dicom_array = dicom_array.astype(np.float32)
+    
+    # Create the grid based on pixel data
+    grid = pv.UnstructuredGrid(dicom_array)
+    
+    # Create the volume plotter
+    plotter = pv.Plotter()
+    plotter.add_volume(grid, scalars=dicom_array.ravel(), opacity='linear', cmap='gray')
+    
+    # Display the 3D visualization
+    plotter.show()
 
 # Function to display the Streamlit app UI
 def main():
-    
-    # App title and introduction
     st.title("🏥 Hospital A Interface")
     st.write("""
     This interface allows you to securely encrypt and embed patient data into an image using DNA encryption and steganography. 
@@ -21,7 +54,6 @@ def main():
 
     with col1:
         st.header("Step 1: Enter Patient Details")
-        # Step 1: User inputs patient details (data to be encrypted)
         patient_data = st.text_area(
             "📝 Enter Patient Details to Encrypt",
             "Patient Name: John Doe; Age: 30; Diagnosis: Healthy;",
@@ -30,7 +62,6 @@ def main():
 
     with col2:
         st.header("Step 2: Upload an Image")
-        # Step 2: User selects an image to use for steganography
         image_file = st.file_uploader(
             "🖼️ Choose an Image to Embed Encrypted Data",
             type=["png", "jpg", "jpeg"],
@@ -39,6 +70,53 @@ def main():
         if image_file:
             st.image(image_file, caption="Uploaded Image Preview", use_column_width=True)
 
+    # DICOM file upload
+    dicom_file = st.file_uploader("📥 Upload DICOM File", type=["dcm"])
+
+    if dicom_file:
+        dicom_data = pydicom.dcmread(dicom_file)
+        st.subheader("DICOM Metadata")
+        st.write({
+            "Patient Name": dicom_data.PatientName if hasattr(dicom_data, 'PatientName') else "N/A",
+            "Patient ID": dicom_data.PatientID if hasattr(dicom_data, 'PatientID') else "N/A",
+            "Age": dicom_data.PatientAge if hasattr(dicom_data, 'PatientAge') else "N/A",
+            "Study Date": dicom_data.StudyDate if hasattr(dicom_data, 'StudyDate') else "N/A",
+            "Modality": dicom_data.Modality if hasattr(dicom_data, 'Modality') else "N/A",
+        })
+
+        # DICOM image preview
+        if hasattr(dicom_data, 'pixel_array'):
+            pixel_array = dicom_data.pixel_array
+            if pixel_array.ndim == 2:
+                # 2D image (single slice)
+                st.image(pixel_array, caption="DICOM Image Preview", use_column_width=True)
+            elif pixel_array.ndim == 3:
+                # 3D image volume (multiple slices)
+                st.image(pixel_array[0], caption="First Slice of DICOM Image Volume", use_column_width=True)
+                
+                # 3D visualization button
+                if st.button("🔍 Visualize in 3D"):
+                    visualize_3d_volume(pixel_array)
+
+            # Generate CSV report
+            if st.button("Generate DICOM Report"):
+                report_df = save_dicom_report(dicom_data)
+                
+                # Create a CSV buffer
+                csv_buffer = io.StringIO()
+                report_df.to_csv(csv_buffer, index=False)
+                csv_buffer.seek(0)  # Move to the beginning of the buffer
+
+                # Provide a download button for the CSV file
+                st.download_button(
+                    label="📥 Download DICOM Report",
+                    data=csv_buffer.getvalue(),
+                    file_name="dicom_report.csv",
+                    mime="text/csv",
+                    help="Click to download the DICOM report as a CSV file."
+                )
+                st.success("Report generated successfully!")
+
     # Encryption key (This should be securely exchanged between hospitals)
     dna_key = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
 
@@ -46,12 +124,10 @@ def main():
     if st.button("🔒 Encrypt and Embed Data"):
         if patient_data and image_file:
             with st.spinner("Encrypting and Embedding Data... Please wait."):
-                # Step 3: Encrypt the patient data using DNA encryption
                 encrypted_data = encrypt_dna(patient_data, dna_key)
                 st.subheader("Encrypted Data (DNA Format)")
                 st.write(encrypted_data)  # Display encrypted data (optional)
 
-                # Step 4: Embed the encrypted data into the selected image using LSB steganography
                 input_image = Image.open(image_file)
                 encoded_image = embed_message(input_image, encrypted_data)
                 
@@ -59,7 +135,7 @@ def main():
                 st.subheader("Encoded Image with Encrypted Data")
                 st.image(encoded_image, caption="Encoded Image Preview", use_column_width=True)
 
-                # Step 5: Provide an option to download the encoded image
+                # Provide an option to download the encoded image
                 buf = io.BytesIO()
                 encoded_image.save(buf, format='PNG')
                 buf.seek(0)
@@ -67,7 +143,6 @@ def main():
                 # Calculate file size
                 file_size = len(buf.getvalue()) / 1024  # Size in KB
 
-                # Improved download button with a progress bar and confirmation message
                 st.success(f"✅ Encoded image is ready for download! File size: {file_size:.2f} KB")
                 st.download_button(
                     label="📥 Download Encoded Image",
@@ -78,11 +153,6 @@ def main():
                 )
         else:
             st.error("⚠️ Please provide both patient details and an image to proceed.")
-        
-        
-            
-
-
 
 # Run the Streamlit app
 if __name__ == "__main__":
