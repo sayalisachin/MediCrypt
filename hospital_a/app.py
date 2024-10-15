@@ -7,6 +7,10 @@ import pyvista as pv
 from PIL import Image
 from encryption import encrypt_dna
 from steganography import embed_message
+import matplotlib.animation as animation
+import matplotlib.pyplot as plt
+import os
+import tempfile
 
 
 # Function to save a DICOM report as a CSV file
@@ -52,6 +56,61 @@ def visualize_3d_volume(dicom_array):
     plotter = pv.Plotter()
     plotter.add_volume(grid, scalars="values", opacity="linear", cmap="gray")
     plotter.show()
+
+def normalize_pixels(pixel_array):
+    min_val = np.min(pixel_array)
+    max_val = np.max(pixel_array)
+    
+    # Normalize the pixel data to [0, 255]
+    normalized_pixels = 255 * (pixel_array - min_val) / (max_val - min_val)
+    
+    return normalized_pixels.astype(np.uint8)
+
+# Function to animate DICOM slices
+def animate_slices(dicom_data):
+    # Get the DICOM pixel array
+    pixel_array = dicom_data.pixel_array
+
+    # Check the number of dimensions and handle accordingly
+    if pixel_array.ndim == 2:  # 2D case
+        pixel_array = pixel_array[np.newaxis, :, :]  # Add an axis to make it 3D
+    elif pixel_array.ndim != 3:
+        st.error("The DICOM file does not contain valid 2D or 3D pixel data.")
+        return
+
+    # Normalize the pixel data
+    pixel_array = normalize_pixels(pixel_array)
+
+    # Set up the figure for animation
+    fig, ax = plt.subplots()
+
+    # Initial plot of the first slice
+    img = ax.imshow(pixel_array[0, :, :], cmap='gray')
+    ax.axis('off')  # Hide axes
+
+    # Function to update each frame of the animation
+    def update(frame):
+        img.set_array(pixel_array[frame, :, :])
+        return [img]
+
+    # Create the animation
+    ani = animation.FuncAnimation(
+        fig, update, frames=range(pixel_array.shape[0]), interval=100, blit=True
+    )
+
+    # Create a temporary file to save the animation
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.gif') as temp_file:
+        ani.save(temp_file.name, fps=10, writer='imagemagick', savefig_kwargs={'bbox_inches': 'tight'})
+        temp_file.seek(0)
+        temp_filename = temp_file.name  # Store the name for later use
+
+    # Read the saved animation back into a BytesIO object
+    with open(temp_filename, 'rb') as f:
+        gif_buffer = io.BytesIO(f.read())
+
+    # Display the GIF in Streamlit
+    st.image(gif_buffer, caption="DICOM Slices Animation", use_column_width=True)
+
 
 # Function to display the Streamlit app UI
 def main():
@@ -128,6 +187,13 @@ def main():
                     help="Click to download the DICOM report as a CSV file."
                 )
                 st.success("Report generated successfully!")
+            if hasattr(dicom_data, 'pixel_array'):
+            # Display the first slice for preview
+                normalized_image = normalize_pixels(dicom_data.pixel_array[0]) if dicom_data.pixel_array.ndim == 2 else normalize_pixels(dicom_data.pixel_array[0])
+                st.image(normalized_image, caption="First DICOM Slice Preview", use_column_width=True)
+            
+            if st.button("🎥 Animate Slices"):
+                animate_slices(dicom_data)
             
 
     # Encryption key (This should be securely exchanged between hospitals)
