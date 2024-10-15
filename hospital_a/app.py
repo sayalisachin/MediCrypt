@@ -26,21 +26,31 @@ def save_dicom_report(dicom_data):
     return df
 
 
-# Function to visualize 3D DICOM images
 def visualize_3d_volume(dicom_array):
-    # Convert pixel array to float
-    dicom_array = dicom_array.astype(np.float32)
+    # Ensure that dicom_array is 3D; if it's not, you may need to reshape or stack slices
+    if len(dicom_array.shape) == 2:
+        # In case it's only a single 2D slice, we stack it into a 3D volume (single layer)
+        dicom_array = np.stack([dicom_array] * 3, axis=-1)
     
-    # Create the grid based on pixel data
-    grid = pv.UnstructuredGrid(dicom_array)
+    # Create a PyVista ImageData object for visualization
+    grid = pv.ImageData()
     
-    # Create the volume plotter
-    plotter = pv.Plotter()
-    plotter.add_volume(grid, scalars=dicom_array.ravel(), opacity='linear', cmap='gray')
+    # Set dimensions: (x, y, z), matching the shape of the DICOM array
+    grid.dimensions = dicom_array.shape
     
-    # Display the 3D visualization
-    plotter.show()
+    # Set the origin (where the data begins in space)
+    grid.origin = (0, 0, 0)
 
+    # Set the spacing between grid points
+    grid.spacing = (1, 1, 1)  # You can adjust the spacing if needed based on the dataset
+
+    # Add the DICOM pixel data as scalar values to the grid
+    grid.point_data["values"] = dicom_array.flatten(order="F")
+
+    # Create the plotter and visualize the 3D volume
+    plotter = pv.Plotter()
+    plotter.add_volume(grid, scalars="values", opacity="linear", cmap="gray")
+    plotter.show()
 # Function to display the Streamlit app UI
 def main():
     st.title("🏥 Hospital A Interface")
