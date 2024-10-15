@@ -8,6 +8,7 @@ from PIL import Image
 from encryption import encrypt_dna
 from steganography import embed_message
 
+
 # Function to save a DICOM report as a CSV file
 # Function to save a DICOM report as a CSV file
 def save_dicom_report(dicom_data):
@@ -51,6 +52,7 @@ def visualize_3d_volume(dicom_array):
     plotter = pv.Plotter()
     plotter.add_volume(grid, scalars="values", opacity="linear", cmap="gray")
     plotter.show()
+
 # Function to display the Streamlit app UI
 def main():
     st.title("🏥 Hospital A Interface")
@@ -126,6 +128,7 @@ def main():
                     help="Click to download the DICOM report as a CSV file."
                 )
                 st.success("Report generated successfully!")
+            
 
     # Encryption key (This should be securely exchanged between hospitals)
     dna_key = {'A': 'T', 'T': 'A', 'C': 'G', 'G': 'C'}
