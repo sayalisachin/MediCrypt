@@ -44,7 +44,7 @@ The encoded image is then sent over a network, and the recipient (Hospital B) ca
   6) DIACOM: Integrates DIACOM and Slice generation to generate slices of 3D-Model based the DIACOM image.
   7) Generate Analytics, Search reports using MatPlotLib.
 
-- **Secure Communication Flow**:
+## **Secure Communication Flow**:
 1) Clinic A:
 
   - Accepts patient details and an image file.
@@ -63,18 +63,31 @@ The encoded image is then sent over a network, and the recipient (Hospital B) ca
 This project demonstrates a secure and innovative approach to encrypting and transmitting sensitive patient information between hospitals using DNA encryption and image steganography. 
 It ensures data privacy, integrity, and confidentiality while providing a user-friendly interface for healthcare professionals.
 
-## Images
-<img width="881" alt="st1" src="https://github.com/user-attachments/assets/add84c66-ce86-44a9-b216-220e0ef93ae7">
-<img width="606" alt="st2" src="https://github.com/user-attachments/assets/7694461b-670a-447f-b6a8-7db2d75d234c">
-<img width="611" alt="st3" src="https://github.com/user-attachments/assets/3a1ee746-f1cc-4ebd-8e27-bce2a240b42b">
-<img width="574" alt="st4" src="https://github.com/user-attachments/assets/50daa0ce-d8ae-4702-aeca-fc40f122539a">
-<img width="569" alt="st5" src="https://github.com/user-attachments/assets/a7a1de09-259d-4a4c-a9a9-69ddc89b631e">
-<img width="571" alt="st6" src="https://github.com/user-attachments/assets/78136391-253d-40c5-bc51-8ec57dadc92a">
-<img width="392" alt="st7" src="https://github.com/user-attachments/assets/e9c4a56b-d146-49e3-9190-1eb51e60a5cd">
-<img width="392" alt="st7" src="https://github.com/user-attachments/assets/245bae9c-7e0d-4b57-89e5-c407a14f0282">
-<img width="392" alt="st7" src="https://github.com/user-attachments/assets/288fea56-7640-40b4-8052-55b12e6b8225">
-<img width="392" alt="st7" src="https://github.com/user-attachments/assets/80ea7998-e8c8-4e5d-a062-acd73c77d8b2">
-
+## Project Images
+<details>
+  <summary>Click to view images</summary>
+  
+  ![st1](https://github.com/user-attachments/assets/add84c66-ce86-44a9-b216-220e0ef93ae7)
+  
+  ![st2](https://github.com/user-attachments/assets/7694461b-670a-447f-b6a8-7db2d75d234c)
+  
+  ![st3](https://github.com/user-attachments/assets/3a1ee746-f1cc-4ebd-8e27-bce2a240b42b)
+  
+  ![st4](https://github.com/user-attachments/assets/50daa0ce-d8ae-4702-aeca-fc40f122539a)
+  
+  ![st5](https://github.com/user-attachments/assets/a7a1de09-259d-4a4c-a9a9-69ddc89b631e)
+  
+  ![st6](https://github.com/user-attachments/assets/78136391-253d-40c5-bc51-8ec57dadc92a)
+  
+  ![st7](https://github.com/user-attachments/assets/e9c4a56b-d146-49e3-9190-1eb51e60a5cd)
+  
+  ![st8](https://github.com/user-attachments/assets/245bae9c-7e0d-4b57-89e5-c407a14f0282)
+  
+  ![st9](https://github.com/user-attachments/assets/288fea56-7640-40b4-8052-55b12e6b8225)
+  
+  ![st10](https://github.com/user-attachments/assets/80ea7998-e8c8-4e5d-a062-acd73c77d8b2)
+  
+</details>
 
 
 
