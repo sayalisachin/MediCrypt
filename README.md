@@ -50,7 +50,7 @@ The encoded image is then sent over a network, and the recipient (Hospital B) ca
   - Accepts patient details and an image file.
   - Encrypts the patient details using the DNA encryption algorithm.
   - Embeds the encrypted data within the image using LSB steganography.
-  - Provides an option to download the stego image for transmission.
+  - Connects to the Websocket server and sends the encrypted image.
 
 2) Clinic B:
 
